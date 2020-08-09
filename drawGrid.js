@@ -51,7 +51,13 @@ const allFalse = function () {
 }
 allFalse();
 
-gridState[1][1] = true;
+gridState[7][4] = true;
+gridState[7][5] = true;
+gridState[7][6] = true;
+gridState[6][6] = true;
+gridState[5][5] = true;
+
+
 
 const resetGrid = function () {
     ctx.clearRect(0, 0, grid.width, grid.height);
@@ -66,7 +72,7 @@ const drawTrue = function () {
         }
     }
 }
-
+/*
 const scan = function (x, y) {
     let trueCount = 0;
     if (x - 1 >= 0 && gridState[x - 1][y] === true) {
@@ -95,14 +101,72 @@ const scan = function (x, y) {
     }
     return trueCount;
 }
+*/
 
+const scan = function (x, y) {
+    let trueCount = 0;
+    if (x - 1 >= 0 && gridState[y][x - 1] === true) {
+        trueCount++;
+    }
+    if (x + 1 < 90 && gridState[y][x + 1] === true) {
+        trueCount++;
+    }
+    if (x - 1 >= 0 && y + 1 < 45 && gridState[y + 1][x - 1] === true) {
+        trueCount++;
+    }
+    if (y + 1 < 45 && gridState[y + 1][x] === true) {
+        trueCount++;
+    }
+    if (x + 1 < 90 && y + 1 < 45 && gridState[y + 1][x + 1] === true) {
+        trueCount++;
+    }
+    if (x - 1 >= 0 && y - 1 >= 0 && gridState[y - 1][x - 1] === true) {
+        trueCount++;
+    }
+    if (y - 1 >= 0 && gridState[y - 1][x] === true) {
+        trueCount++;
+    }
+    if (x + 1 < 90 && y - 1 >= 0 && gridState[y - 1][x + 1] === true) {
+        trueCount++;
+    }
+    return trueCount;
+}
+
+const scanAll = function () {
+    let trueCount = 0;
+    for (let y = 0; y < 45; y++) {
+        for (let x = 0; x < 90; x++) {
+            trueCount = scan(x, y);
+            if (gridState[y][x] == true) {
+                if (trueCount >= 2 && trueCount < 5) {
+                    gsCopy[y][x] = true;
+                } else {
+                    gsCopy[y][x] = false;
+                }
+            } else {
+                if (trueCount >= 3 && trueCount < 5) {
+                    gsCopy[y][x] = true;
+                } else {
+                    gsCopy[y][x] = false;
+                }
+            }
+             
+        }
+    }
+}
 
 
 drawTrue();
 draw();
 
+
 const aTurn = function () {
     // Update the gridState for the new turn
+    
+    scanAll();
+    const gsTemp = gridState;
+    gridState = gsCopy;
+    gsCopy = gsTemp;
     resetGrid();
     drawTrue();
     draw();
@@ -111,7 +175,7 @@ const aTurn = function () {
 let intervalRef;
 startButton.onclick = function () {
 
-    intervalRef = setInterval(aTurn, 300);
+    intervalRef = setInterval(aTurn, 1000);
 }
 
 stopButton.onclick = function () {
